@@ -7,8 +7,7 @@ import {
   Activity, 
   Mic, 
   Compass, 
-  Orbit,
-  Sparkles
+  Orbit
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
 
@@ -33,7 +32,7 @@ export const BeyondCode: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col items-start mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-xs font-semibold text-purple-300 mb-3 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Compass className="w-3.5 h-3.5" />
             <span>Interests &amp; Pursuits</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight text-white">

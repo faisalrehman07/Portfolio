@@ -9,23 +9,36 @@ import {
   Clock, 
   ArrowUpRight,
   MessageSquare,
-  CheckCircle2,
-  Sparkles
+  CheckCircle2
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
+import { triggerConfetti } from '../utils/confetti';
+import { soundEngine } from '../utils/sound';
+import { useToast } from './Toast';
 
-export const Contact: React.FC = () => {
+interface ContactProps {
+  initialSubject?: string;
+}
+
+export const Contact: React.FC<ContactProps> = ({ initialSubject = '' }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [bangaloreTime, setBangaloreTime] = useState('');
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
+    subject: initialSubject,
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [prevSubject, setPrevSubject] = useState(initialSubject);
+
+  if (initialSubject !== prevSubject) {
+    setPrevSubject(initialSubject);
+    setFormData(prev => ({ ...prev, subject: initialSubject }));
+  }
 
   useEffect(() => {
     const updateTime = () => {
@@ -46,11 +59,15 @@ export const Contact: React.FC = () => {
 
   const copyToClipboard = (text: string, type: 'email' | 'phone') => {
     navigator.clipboard.writeText(text);
+    soundEngine.playSuccess();
+    triggerConfetti();
     if (type === 'email') {
       setCopiedEmail(true);
+      showToast('Copied email to clipboard!', 'success');
       setTimeout(() => setCopiedEmail(false), 2000);
     } else {
       setCopiedPhone(true);
+      showToast('Copied phone number to clipboard!', 'success');
       setTimeout(() => setCopiedPhone(false), 2000);
     }
   };
@@ -58,6 +75,10 @@ export const Contact: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
+
+    soundEngine.playSuccess();
+    triggerConfetti();
+    showToast('Preparing your transmission via email client...', 'cosmic');
 
     const mailtoUrl = `mailto:${resumeData.personal.email}?subject=${encodeURIComponent(
       formData.subject || `Inquiry from ${formData.name}`
@@ -75,7 +96,7 @@ export const Contact: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col items-start mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-xs font-semibold text-rose-300 mb-3 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Send className="w-3.5 h-3.5" />
             <span>Connect &amp; Collaborate</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight text-white">

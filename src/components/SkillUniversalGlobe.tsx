@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { 
-  Sparkles, 
   Layers, 
   ArrowRight, 
   RotateCw, 
@@ -10,8 +9,10 @@ import {
   Shield,
   Brain,
   Database,
-  Code
+  Code,
+  Workflow
 } from 'lucide-react';
+import { soundEngine } from '../utils/sound';
 
 export interface UniversalSkillNode {
   id: string;
@@ -28,6 +29,19 @@ export interface UniversalSkillNode {
 }
 
 const UNIVERSAL_SKILL_NODES: UniversalSkillNode[] = [
+  {
+    id: 'ai-tools-ecosystem',
+    name: 'AI Tools & Antigravity',
+    category: 'Agentic Workflows & Prompting',
+    iconName: 'Workflow',
+    description: 'Autonomous development workflows with Google Antigravity, Google AI Studio, multi-modal prompting, and advanced prompt engineering.',
+    techStack: ['Google Antigravity', 'Google AI Studio', 'Prompt Engineering', 'Gemini Models', 'AI Agent Workflows'],
+    proficiency: 95,
+    targetSection: 'skills',
+    color: '#06b6d4', // Cyan
+    phi: 1.5,
+    theta: 1.6
+  },
   {
     id: 'ai-deeplearning',
     name: 'AI & Deep Learning',
@@ -397,6 +411,33 @@ export const SkillUniversalGlobe: React.FC<SkillUniversalGlobeProps> = ({ onSele
       setHoveredNode(null);
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        prevMouseX = e.touches[0].clientX;
+        prevMouseY = e.touches[0].clientY;
+        velocityX = 0;
+        velocityY = 0;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging && e.touches.length === 1) {
+        const deltaX = e.touches[0].clientX - prevMouseX;
+        const deltaY = e.touches[0].clientY - prevMouseY;
+        globeRoot.rotation.y += deltaX * 0.007;
+        globeRoot.rotation.x += deltaY * 0.007;
+        velocityX = deltaX * 0.007;
+        velocityY = deltaY * 0.007;
+        prevMouseX = e.touches[0].clientX;
+        prevMouseY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isDragging = false;
+    };
+
     const handleClick = (e: MouseEvent) => {
       if (Math.abs(velocityX) > 0.01 || Math.abs(velocityY) > 0.01) return;
 
@@ -410,6 +451,7 @@ export const SkillUniversalGlobe: React.FC<SkillUniversalGlobeProps> = ({ onSele
         const hit = intersects[0].object;
         const skill = hit.userData?.skillNode as UniversalSkillNode | undefined;
         if (skill) {
+          soundEngine.playClick();
           setSelectedNode(skill);
         }
       }
@@ -420,6 +462,9 @@ export const SkillUniversalGlobe: React.FC<SkillUniversalGlobeProps> = ({ onSele
     window.addEventListener('mouseup', handleMouseUp);
     container.addEventListener('mouseleave', handleMouseLeave);
     container.addEventListener('click', handleClick);
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd);
 
     // 8. Animation & Render Loop
     let animFrameId: number;
@@ -494,6 +539,9 @@ export const SkillUniversalGlobe: React.FC<SkillUniversalGlobeProps> = ({ onSele
       window.removeEventListener('mouseup', handleMouseUp);
       container.removeEventListener('mouseleave', handleMouseLeave);
       container.removeEventListener('click', handleClick);
+      container.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('resize', handleResize);
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
@@ -506,13 +554,14 @@ export const SkillUniversalGlobe: React.FC<SkillUniversalGlobeProps> = ({ onSele
 
   const getNodeIcon = (iconName: string) => {
     switch (iconName) {
+      case 'Workflow': return <Workflow className="w-4 h-4 text-cyan-400" />;
       case 'Brain': return <Brain className="w-4 h-4 text-cyan-400" />;
       case 'Code': return <Code className="w-4 h-4 text-indigo-400" />;
       case 'Shield': return <Shield className="w-4 h-4 text-rose-400" />;
       case 'Layers': return <Layers className="w-4 h-4 text-emerald-400" />;
       case 'Database': return <Database className="w-4 h-4 text-amber-400" />;
       case 'Cpu': return <Cpu className="w-4 h-4 text-purple-400" />;
-      default: return <Sparkles className="w-4 h-4 text-cyan-400" />;
+      default: return <Globe2 className="w-4 h-4 text-cyan-400" />;
     }
   };
 

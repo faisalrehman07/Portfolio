@@ -6,19 +6,20 @@ import {
   ShieldCheck, 
   Layers, 
   Search,
-  Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  Cpu
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
 
 export const SkillConstellation: React.FC<{ onNavigateProjects?: () => void }> = () => {
-  const [activeClusterId, setActiveClusterId] = useState<string>('ai-ml');
+  const [activeClusterId, setActiveClusterId] = useState<string>('ai-tools-prompting');
   const [searchQuery, setSearchQuery] = useState('');
 
   const activeCluster = resumeData.skillClusters.find(c => c.id === activeClusterId) || resumeData.skillClusters[0];
 
   const getClusterIcon = (iconName: string) => {
     switch (iconName) {
+      case 'Cpu': return <Cpu className="w-5 h-5 text-cyan-400" />;
       case 'Brain': return <Brain className="w-5 h-5 text-cyan-400" />;
       case 'Code2': return <Code2 className="w-5 h-5 text-indigo-400" />;
       case 'BarChart3': return <BarChart3 className="w-5 h-5 text-emerald-400" />;
@@ -33,7 +34,7 @@ export const SkillConstellation: React.FC<{ onNavigateProjects?: () => void }> =
         {/* Section Header */}
         <div className="flex flex-col items-start mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-semibold text-cyan-300 mb-3 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Layers className="w-3.5 h-3.5" />
             <span>Technical Expertise</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight text-white">

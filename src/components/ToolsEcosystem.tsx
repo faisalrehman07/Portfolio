@@ -8,9 +8,10 @@ import {
   Cloud, 
   FileText, 
   Calendar,
-  Layers,
-  Sparkles,
-  Info
+  Layers, 
+  Info,
+  Cpu,
+  Boxes
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
 import type { ToolItem } from '../data/resume';
@@ -20,10 +21,11 @@ export const ToolsEcosystem: React.FC = () => {
 
   const getToolIcon = (iconName: string) => {
     switch (iconName) {
+      case 'Cpu': return <Cpu className="w-6 h-6 text-cyan-400" />;
       case 'Terminal': return <Terminal className="w-6 h-6 text-amber-400" />;
       case 'PieChart': return <PieChart className="w-6 h-6 text-blue-400" />;
       case 'BarChart': return <BarChart className="w-6 h-6 text-yellow-400" />;
-      case 'Workflow': return <Workflow className="w-6 h-6 text-orange-400" />;
+      case 'Workflow': return <Workflow className="w-6 h-6 text-cyan-400" />;
       case 'CheckSquare': return <CheckSquare className="w-6 h-6 text-blue-400" />;
       case 'Cloud': return <Cloud className="w-6 h-6 text-cyan-400" />;
       case 'FileText': return <FileText className="w-6 h-6 text-indigo-400" />;
@@ -40,14 +42,14 @@ export const ToolsEcosystem: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-semibold text-cyan-300 mb-2.5 backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Productivity &amp; Toolchain</span>
+                <Boxes className="w-3.5 h-3.5" />
+                <span>AI Tools &amp; Developer Toolchain</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold font-display text-white">
-                Developer Software &amp; Platform Ecosystem
+                Developer Software &amp; AI Platform Ecosystem
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl leading-relaxed">
-                Software tools and platforms utilized across full-stack engineering, exploratory data analysis, agile delivery, and UI architecture.
+                Platforms and software environments including Google Antigravity, Google AI Studio, prompt engineering pipelines, and agile devtools.
               </p>
             </div>
 

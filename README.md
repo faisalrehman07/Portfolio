@@ -4,9 +4,10 @@ A portfolio website engineered for **Faisal Rehman** (AI & Data Science Graduate
 
 ---
 
-## 🌟 Core Highlights & Features
+## Core Highlights & Features
 
 - **Strict Source of Truth**: All information, projects, technologies, and milestones are directly derived from `FAISAL_REHMAN.pdf` with no fabricated claims or exaggerated statistics.
+- **AI Tools & Prompt Engineering Focus**: Highlights active proficiency with Google Antigravity, Google AI Studio, Gemini API, and advanced prompt engineering.
 - **3D Celestial Ecosystem Globe**: Built with Three.js, featuring orbiting technology nodes (AI, ML, Python, Full Stack, Cybersecurity, IoT, DBMS, UI/UX) that respond to mouse motion, clicks, and jumps to sections.
 - **Dual Visual Themes**:
   - **Cosmic Dark Mode**: Deep void obsidian (`#05070e`), glowing nebular gradients, and starfield canvas with subtle meteors.
@@ -19,7 +20,7 @@ A portfolio website engineered for **Faisal Rehman** (AI & Data Science Graduate
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Framework**: React 19 + TypeScript
 - **Bundler & Dev Server**: Vite
@@ -31,7 +32,7 @@ A portfolio website engineered for **Faisal Rehman** (AI & Data Science Graduate
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Install Dependencies
 ```bash
@@ -52,7 +53,7 @@ Generates production assets in the `dist/` folder.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── public/

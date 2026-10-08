@@ -5,8 +5,7 @@ import {
   Brain, 
   X,
   ChevronRight,
-  BookOpen,
-  Sparkles
+  BookOpen
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
 import type { CertificationItem } from '../data/resume';
@@ -30,7 +29,7 @@ export const Certifications: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col items-start mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-xs font-semibold text-yellow-300 mb-3 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Award className="w-3.5 h-3.5" />
             <span>Credentials &amp; Accreditations</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight text-white">

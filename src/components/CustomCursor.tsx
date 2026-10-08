@@ -5,6 +5,7 @@ export const CustomCursor: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
   const [isCardHovered, setIsCardHovered] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
 
@@ -18,38 +19,34 @@ export const CustomCursor: React.FC = () => {
     const updateMouse = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       if (!isVisible) setIsVisible(true);
+
+      // High-performance event delegation using closest()
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const isClickable = !!target.closest('a, button, input, textarea, select, [role="button"], .cursor-pointer');
+        const isCard = !!target.closest('.interactive-card, .glass-panel');
+        setIsHovered(isClickable);
+        setIsCardHovered(!isClickable && isCard);
+      }
     };
 
+    const handleMouseDown = () => setIsClicking(true);
+    const handleMouseUp = () => setIsClicking(false);
     const handleMouseLeave = () => setIsVisible(false);
     const handleMouseEnter = () => setIsVisible(true);
 
-    const handleElementsHover = () => {
-      const interactiveButtons = document.querySelectorAll('a, button, input, textarea, select, [role="button"]');
-      interactiveButtons.forEach(el => {
-        el.addEventListener('mouseenter', () => setIsHovered(true));
-        el.addEventListener('mouseleave', () => setIsHovered(false));
-      });
-
-      const interactiveCards = document.querySelectorAll('.interactive-card, .glass-panel');
-      interactiveCards.forEach(el => {
-        el.addEventListener('mouseenter', () => setIsCardHovered(true));
-        el.addEventListener('mouseleave', () => setIsCardHovered(false));
-      });
-    };
-
-    window.addEventListener('mousemove', updateMouse);
+    window.addEventListener('mousemove', updateMouse, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', handleMouseEnter);
 
-    handleElementsHover();
-    const observer = new MutationObserver(handleElementsHover);
-    observer.observe(document.body, { childList: true, subtree: true });
-
     return () => {
       window.removeEventListener('mousemove', updateMouse);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
-      observer.disconnect();
     };
   }, [isVisible]);
 
@@ -59,42 +56,44 @@ export const CustomCursor: React.FC = () => {
 
   return (
     <>
-      {/* Outer Magnetic Glow Ring */}
+      {/* Outer Magnetic Glow Aura Ring */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-50 rounded-full border border-cyan-400/50 mix-blend-screen"
+        className="fixed top-0 left-0 pointer-events-none z-50 rounded-full border mix-blend-screen"
         animate={{
-          x: mousePosition.x - (activeHover ? 26 : 16),
-          y: mousePosition.y - (activeHover ? 26 : 16),
-          width: activeHover ? 52 : 32,
-          height: activeHover ? 52 : 32,
+          x: mousePosition.x - (activeHover ? 26 : isClicking ? 14 : 16),
+          y: mousePosition.y - (activeHover ? 26 : isClicking ? 14 : 16),
+          width: activeHover ? 52 : isClicking ? 28 : 32,
+          height: activeHover ? 52 : isClicking ? 28 : 32,
           backgroundColor: isHovered 
-            ? 'rgba(6, 182, 212, 0.2)' 
+            ? 'rgba(6, 182, 212, 0.22)' 
             : isCardHovered 
-            ? 'rgba(129, 140, 248, 0.12)' 
-            : 'rgba(6, 182, 212, 0.04)',
-          borderColor: isHovered ? 'rgba(56, 189, 248, 0.8)' : 'rgba(56, 189, 248, 0.4)',
+            ? 'rgba(129, 140, 248, 0.14)' 
+            : 'rgba(6, 182, 212, 0.05)',
+          borderColor: isHovered ? 'rgba(56, 189, 248, 0.9)' : 'rgba(56, 189, 248, 0.45)',
+          scale: isClicking ? 0.9 : 1,
         }}
         transition={{
           type: 'spring',
-          damping: 26,
-          stiffness: 380,
-          mass: 0.4,
+          damping: 28,
+          stiffness: 420,
+          mass: 0.35,
         }}
       />
-      {/* Central Precision Point */}
+
+      {/* Central Precision Point with Click Impulse */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-50 rounded-full bg-cyan-400 shadow-[0_0_10px_#38bdf8]"
+        className="fixed top-0 left-0 pointer-events-none z-50 rounded-full bg-cyan-400 shadow-[0_0_12px_#38bdf8]"
         animate={{
           x: mousePosition.x - (isHovered ? 4 : 3),
           y: mousePosition.y - (isHovered ? 4 : 3),
           width: isHovered ? 8 : 6,
           height: isHovered ? 8 : 6,
-          scale: isHovered ? 1.4 : 1,
+          scale: isClicking ? 1.8 : isHovered ? 1.4 : 1,
         }}
         transition={{
           type: 'spring',
           damping: 35,
-          stiffness: 850,
+          stiffness: 900,
         }}
       />
     </>

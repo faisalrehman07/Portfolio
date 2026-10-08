@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Code2, 
   Bot, 
@@ -9,10 +9,16 @@ import {
   Wallet, 
   ArrowRight, 
   Building,
-  Sparkles
+  FolderGit2,
+  Search,
+  X,
+  Copy,
+  Check
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
 import type { ProjectItem } from '../data/resume';
+import { soundEngine } from '../utils/sound';
+import { useToast } from './Toast';
 
 interface ProjectsProps {
   onSelectProject: (project: ProjectItem) => void;
@@ -20,6 +26,10 @@ interface ProjectsProps {
 
 export const Projects: React.FC<ProjectsProps> = ({ onSelectProject }) => {
   const [activeFilter, setActiveFilter] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedTech, setSelectedTech] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const filterOptions = [
     'All',
@@ -28,6 +38,13 @@ export const Projects: React.FC<ProjectsProps> = ({ onSelectProject }) => {
     'Full Stack',
     'IoT / Hardware'
   ];
+
+  // Unique technology tags across all projects
+  const allTechTags = useMemo(() => {
+    const set = new Set<string>();
+    resumeData.projects.forEach(p => p.technologies.forEach(t => set.add(t)));
+    return Array.from(set).slice(0, 10);
+  }, []);
 
   const getProjectIcon = (iconName: string) => {
     switch (iconName) {
@@ -42,18 +59,46 @@ export const Projects: React.FC<ProjectsProps> = ({ onSelectProject }) => {
   };
 
   const filteredProjects = resumeData.projects.filter(p => {
-    if (activeFilter === 'All') return true;
-    if (activeFilter === 'Featured Internship Case Study') return p.category === 'Internship Case Study';
-    return p.category === activeFilter;
+    // Category filter
+    let matchesCategory = true;
+    if (activeFilter === 'Featured Internship Case Study') {
+      matchesCategory = p.category === 'Internship Case Study';
+    } else if (activeFilter !== 'All') {
+      matchesCategory = p.category === activeFilter;
+    }
+
+    // Tech filter
+    const matchesTech = !selectedTech || p.technologies.includes(selectedTech);
+
+    // Search query
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !q || (
+      p.title.toLowerCase().includes(q) ||
+      p.shortDescription.toLowerCase().includes(q) ||
+      p.technologies.some(t => t.toLowerCase().includes(q)) ||
+      p.category.toLowerCase().includes(q)
+    );
+
+    return matchesCategory && matchesTech && matchesSearch;
   });
+
+  const handleCopySummary = (p: ProjectItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const text = `${p.title} (${p.type})\n${p.shortDescription}\nTech: ${p.technologies.join(', ')}`;
+    navigator.clipboard.writeText(text);
+    setCopiedId(p.id);
+    showToast(`Copied summary for ${p.title}!`, 'success');
+    soundEngine.playSuccess();
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   return (
     <section id="projects" className="py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col items-start mb-14">
+        <div className="flex flex-col items-start mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-semibold text-emerald-300 mb-3 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
+            <FolderGit2 className="w-3.5 h-3.5" />
             <span>Case Studies &amp; Projects</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight text-white">
@@ -64,28 +109,99 @@ export const Projects: React.FC<ProjectsProps> = ({ onSelectProject }) => {
           </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2 sm:gap-2.5 mb-12 pb-4 border-b border-slate-800">
-          {filterOptions.map(filter => {
-            const isActive = activeFilter === filter;
-            return (
+        {/* Search & Filter Control Bar */}
+        <div className="p-4 sm:p-5 rounded-3xl glass-panel border border-slate-800 mb-8 space-y-4">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search projects by keyword, tech, or title... (e.g. 'rPPG', 'MySQL', 'IoT')"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Results counter badge */}
+            <div className="flex items-center gap-2 text-xs text-slate-400 font-mono shrink-0 self-end md:self-center">
+              <span>Showing</span>
+              <span className="font-bold text-cyan-300 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                {filteredProjects.length} of {resumeData.projects.length}
+              </span>
+              <span>projects</span>
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/80">
+            {filterOptions.map(filter => {
+              const isActive = activeFilter === filter;
+              return (
+                <button
+                  key={filter}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setActiveFilter(filter);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)] scale-105'
+                      : 'bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700'
+                  }`}
+                >
+                  {filter}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Popular Tech Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 text-xs">
+            <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">Tech Filter:</span>
+            {allTechTags.map(tech => {
+              const isSelected = selectedTech === tech;
+              return (
+                <button
+                  key={tech}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setSelectedTech(prev => (prev === tech ? null : tech));
+                  }}
+                  className={`px-2 py-0.5 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
+                    isSelected
+                      ? 'bg-cyan-500 text-slate-950 font-bold border border-cyan-400'
+                      : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-cyan-300 hover:border-slate-700'
+                  }`}
+                >
+                  {tech}
+                </button>
+              );
+            })}
+            {selectedTech && (
               <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                  isActive
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)] scale-105'
-                    : 'glass-panel border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700'
-                }`}
+                onClick={() => setSelectedTech(null)}
+                className="text-[10px] text-rose-400 hover:underline ml-1"
               >
-                {filter}
+                Clear filter
               </button>
-            );
-          })}
+            )}
+          </div>
         </div>
 
         {/* Featured Case Study: Hospital Management System */}
-        {activeFilter === 'All' || activeFilter === 'Featured Internship Case Study' || activeFilter === 'Full Stack' ? (
+        {(activeFilter === 'All' || activeFilter === 'Featured Internship Case Study' || activeFilter === 'Full Stack') &&
+         !searchQuery && !selectedTech && (
           <div className="mb-12">
             {resumeData.projects.filter(p => p.id === 'hospital-management-system').map(hospitalProj => (
               <div
@@ -114,13 +230,25 @@ export const Projects: React.FC<ProjectsProps> = ({ onSelectProject }) => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => onSelectProject(hospitalProj)}
-                    className="px-6 py-3 rounded-2xl text-xs sm:text-sm font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 to-sky-400 hover:from-cyan-300 hover:to-sky-300 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 flex items-center gap-2 shrink-0 cursor-pointer"
-                  >
-                    <span>View Technical Dossier</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2.5">
+                    <button
+                      onClick={(e) => handleCopySummary(hospitalProj, e)}
+                      className="p-3 rounded-2xl glass-panel border border-slate-700 hover:text-cyan-300 transition-colors text-slate-400"
+                      title="Copy Project Summary"
+                    >
+                      {copiedId === hospitalProj.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => {
+                        soundEngine.playClick();
+                        onSelectProject(hospitalProj);
+                      }}
+                      className="px-6 py-3 rounded-2xl text-xs sm:text-sm font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 to-sky-400 hover:from-cyan-300 hover:to-sky-300 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 flex items-center gap-2 shrink-0 cursor-pointer"
+                    >
+                      <span>View Technical Dossier</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
@@ -167,74 +295,98 @@ export const Projects: React.FC<ProjectsProps> = ({ onSelectProject }) => {
               </div>
             ))}
           </div>
-        ) : null}
+        )}
 
         {/* Project Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects
-            .filter(p => p.id !== 'hospital-management-system' || activeFilter !== 'All')
-            .map(project => (
-              <div
-                key={project.id}
-                className="p-7 rounded-3xl glass-panel border border-slate-800/90 hover:border-cyan-500/50 transition-all duration-300 flex flex-col justify-between group interactive-card card-shine"
-              >
-                <div>
-                  {/* Category & Type */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className="text-[10px] uppercase font-bold px-2.5 py-1 rounded-full bg-slate-800 text-cyan-300 border border-slate-700">
-                      {project.category}
-                    </span>
-                    <span className="text-xs text-slate-400 font-medium">
-                      {project.type.replace('Project', '')}
-                    </span>
-                  </div>
-
-                  {/* Icon & Title */}
-                  <div className="flex items-start gap-3.5 mb-3.5">
-                    <div className="p-3 rounded-2xl bg-slate-800/80 group-hover:bg-cyan-500/15 group-hover:scale-110 transition-all shrink-0 shadow-sm">
-                      {getProjectIcon(project.iconName)}
-                    </div>
-                    <h3 className="text-lg font-bold font-display text-white group-hover:text-cyan-300 transition-colors leading-snug">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  {/* Short Description */}
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 line-clamp-3">
-                    {project.shortDescription}
-                  </p>
-                </div>
-
-                <div>
-                  {/* Tech Tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-6 pt-4 border-t border-slate-800/80">
-                    {project.technologies.slice(0, 3).map((t, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800"
+        {filteredProjects.length === 0 ? (
+          <div className="py-16 text-center glass-panel rounded-3xl border border-slate-800">
+            <p className="text-base text-slate-300 font-semibold mb-2">No projects matched your search criteria.</p>
+            <p className="text-xs text-slate-500 mb-4">Try clearing the search query or selecting &ldquo;All&rdquo; categories.</p>
+            <button
+              onClick={() => {
+                setActiveFilter('All');
+                setSearchQuery('');
+                setSelectedTech(null);
+              }}
+              className="px-4 py-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-xs font-semibold"
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects
+              .filter(p => p.id !== 'hospital-management-system' || activeFilter !== 'All' || !!searchQuery || !!selectedTech)
+              .map(project => (
+                <div
+                  key={project.id}
+                  className="p-7 rounded-3xl glass-panel border border-slate-800/90 hover:border-cyan-500/50 transition-all duration-300 flex flex-col justify-between group interactive-card card-shine"
+                >
+                  <div>
+                    {/* Category & Type */}
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                      <span className="text-[10px] uppercase font-bold px-2.5 py-1 rounded-full bg-slate-800 text-cyan-300 border border-slate-700">
+                        {project.category}
+                      </span>
+                      <button
+                        onClick={(e) => handleCopySummary(project, e)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 transition-colors"
+                        title="Copy Summary"
                       >
-                        {t}
-                      </span>
-                    ))}
-                    {project.technologies.length > 3 && (
-                      <span className="px-2 py-1 rounded-lg text-[10px] font-medium bg-slate-900 text-slate-400 border border-slate-800">
-                        +{project.technologies.length - 3}
-                      </span>
-                    )}
+                        {copiedId === project.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+
+                    {/* Icon & Title */}
+                    <div className="flex items-start gap-3.5 mb-3.5">
+                      <div className="p-3 rounded-2xl bg-slate-800/80 group-hover:bg-cyan-500/15 group-hover:scale-110 transition-all shrink-0 shadow-sm">
+                        {getProjectIcon(project.iconName)}
+                      </div>
+                      <h3 className="text-lg font-bold font-display text-white group-hover:text-cyan-300 transition-colors leading-snug">
+                        {project.title}
+                      </h3>
+                    </div>
+
+                    {/* Short Description */}
+                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 line-clamp-3">
+                      {project.shortDescription}
+                    </p>
                   </div>
 
-                  {/* Action Button */}
-                  <button
-                    onClick={() => onSelectProject(project)}
-                    className="w-full py-3 rounded-2xl text-xs font-semibold glass-panel border border-slate-700 group-hover:border-cyan-500/50 group-hover:text-cyan-300 group-hover:bg-cyan-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>View Case Study</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  <div>
+                    {/* Tech Tags */}
+                    <div className="flex flex-wrap gap-1.5 mb-6 pt-4 border-t border-slate-800/80">
+                      {project.technologies.slice(0, 3).map((t, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                      {project.technologies.length > 3 && (
+                        <span className="px-2 py-1 rounded-lg text-[10px] font-medium bg-slate-900 text-slate-400 border border-slate-800">
+                          +{project.technologies.length - 3}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      onClick={() => {
+                        soundEngine.playClick();
+                        onSelectProject(project);
+                      }}
+                      className="w-full py-3 rounded-2xl text-xs font-semibold glass-panel border border-slate-700 group-hover:border-cyan-500/50 group-hover:text-cyan-300 group-hover:bg-cyan-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>View Technical Dossier</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-        </div>
+              ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -51,7 +51,7 @@ export interface SkillCategory {
 
 export interface ToolItem {
   name: string;
-  category: 'Development' | 'Data & BI' | 'Collaboration & Agile' | 'Diagramming & Planning';
+  category: 'Development' | 'Data & BI' | 'Collaboration & Agile' | 'Diagramming & Planning' | 'AI Tools & Prototyping';
   purpose: string;
   icon: string;
 }
@@ -95,9 +95,9 @@ export interface ResumeData {
 export const resumeData: ResumeData = {
   personal: {
     name: "FAISAL REHMAN",
-    role: "AI & Data Science Graduate",
-    positioning: "Fresher / IT Graduate",
-    tagline: "Building at the intersection of Artificial Intelligence, Full-Stack Architecture, Data Science, and Modern Systems.",
+    role: "AI & Data Science Graduate | AI Tools Enthusiast",
+    positioning: "AI Tools Power User & Software Engineer",
+    tagline: "Engineering software and intelligent pipelines by leveraging Google Antigravity, Google AI Studio, Advanced Prompt Engineering, and Modern Full-Stack Architectures.",
     location: "Bangalore, India",
     email: "fr848808@gmail.com",
     phone: "+91 9620532473",
@@ -105,15 +105,15 @@ export const resumeData: ResumeData = {
     github: "https://github.com/faisalrehman07/",
     resumeUrl: "/FAISAL_REHMAN.pdf",
     availability: "Actively seeking Full-Time Engineering Roles in AI, Software & Data",
-    aboutNarrative: `I am a highly motivated and detail-oriented IT graduate with a solid academic and hands-on foundation in software development, data structures, and system management. My core competencies span programming in Python, Java, and SQL, coupled with rigorous academic training in Artificial Intelligence and Data Science.
+    aboutNarrative: `I am an IT graduate with a strong academic foundation in Artificial Intelligence and Data Science, coupled with a deep passion for modern AI developer tools. I actively utilize state-of-the-art AI platforms—including Google Antigravity, Google AI Studio, sophisticated prompt engineering methodologies, and LLM APIs—as an engineering force multiplier to rapidly architect, develop, and refine robust software projects.
 
-Through academic projects and specialized internships, I have cultivated practical exposure to web development, machine learning pipelines, vulnerability assessment (VAPT), IoT architectures, and database engineering. As a proactive learner and collaborative team player, I am passionate about tackling complex technical challenges, writing clean and reliable code, and contributing to innovative, technology-driven engineering teams.`,
+My core competencies span Python, Java, SQL, and .NET, alongside practical exposure to machine learning pipelines, vulnerability assessment (VAPT), and database systems. By pairing rigorous computer science fundamentals with advanced AI toolchain proficiency, I deliver reliable, clean, and forward-looking digital solutions.`,
     quickHighlights: [
       { label: "Degree", value: "B.E. AI & Data Science" },
       { label: "Graduation", value: "Class of 2025" },
       { label: "CGPA", value: "7.9 / 10" },
       { label: "University", value: "VTU / Navkis College" },
-      { label: "Location", value: "Bangalore, India" },
+      { label: "AI Tooling", value: "Antigravity, AI Studio & Prompting" },
       { label: "Focus", value: "AI, ML, Full Stack & VAPT" }
     ]
   },
@@ -138,24 +138,38 @@ Through academic projects and specialized internships, I have cultivated practic
   },
 
   industryExpertise: [
+    { title: "AI Tools & Rapid Prototyping", desc: "Supercharging software engineering velocity with Google Antigravity, Google AI Studio, and sophisticated prompt architectures." },
     { title: "Information Technology", desc: "Solid computing foundation, system architecture, enterprise IT processes, and software lifecycle." },
     { title: "Artificial Intelligence", desc: "Supervised and unsupervised learning, model evaluation, optimization, and prompt engineering." },
     { title: "Full Stack Development", desc: "End-to-end web applications, frontend UI/UX, backend API integration, and database operations." },
     { title: "Database Management", desc: "Relational database schema design, indexing, SQL queries, MySQL optimization, and data modeling." },
     { title: "Internet of Things (IoT)", desc: "Embedded sensor integration, automated telemetry, manual rover teleoperation, and real-time control." },
     { title: "Cybersecurity & VAPT", desc: "Vulnerability assessment, web application penetration testing, network defense, and secure coding." },
-    { title: "Prompt Engineering", desc: "Structured prompt design, AI workflow automation, tool orchestration, and LLM integrations." }
+    { title: "Prompt Engineering", desc: "Structured prompt design, system instructions, few-shot conditioning, and LLM tool orchestration." }
   ],
 
   areasOfExpertise: [
-    "Project Management",
-    "Error Debugger",
+    "AI Tools & Prompt Engineer",
     "Full Stack Developer",
+    "Error Debugger",
+    "Project Management",
     "UI/UX Designer",
     "Team Management"
   ],
 
   skillClusters: [
+    {
+      id: "ai-tools-prompting",
+      name: "AI Tools & Prompt Engineering",
+      icon: "Cpu",
+      description: "Harnessing Google Antigravity, Google AI Studio, and advanced prompting techniques to architect and accelerate software delivery.",
+      skills: [
+        { name: "Google Antigravity & Agentic Workflows", description: "Agentic AI development, multi-tool orchestration, autonomous task execution, and accelerated shipping.", tags: ["Google Antigravity", "AI Agents"] },
+        { name: "Google AI Studio & Gemini Ecosystem", description: "Prototyping with Gemini models, temperature/safety calibration, multimodal vision-text inputs, and structured JSON generation.", tags: ["Google AI Studio", "Gemini"] },
+        { name: "Advanced Prompt Engineering", description: "Few-shot prompting, system instruction design, chain-of-thought logic decomposition, and deterministic LLM outputs.", tags: ["Prompting", "LLMs"] },
+        { name: "AI-Accelerated Development", description: "Using modern LLM toolchains to rapidly ideate, build full-stack interfaces, write clean tests, and debug complex codebases.", tags: ["Productivity", "Fast Shipping"] }
+      ]
+    },
     {
       id: "ai-ml",
       name: "AI & Machine Learning",
@@ -223,6 +237,10 @@ Through academic projects and specialized internships, I have cultivated practic
   ],
 
   tools: [
+    { name: "Google Antigravity", category: "AI Tools & Prototyping", purpose: "Agentic AI development environment, multi-agent orchestration, and accelerated full-stack building.", icon: "Cpu" },
+    { name: "Google AI Studio", category: "AI Tools & Prototyping", purpose: "Prototyping Gemini models, multimodal prompt tuning, system instructions, and API key orchestration.", icon: "Workflow" },
+    { name: "Prompt Engineering", category: "AI Tools & Prototyping", purpose: "Structured system prompting, few-shot conditioning, JSON schema generation, and tool chaining.", icon: "Terminal" },
+    { name: "ChatGPT & Claude", category: "AI Tools & Prototyping", purpose: "AI-assisted system architecture, rapid code review, bug isolation, and workflow automation.", icon: "FileText" },
     { name: "Jupyter", category: "Development", purpose: "Interactive Python execution, exploratory data analysis, and ML model experimentation.", icon: "Terminal" },
     { name: "Tableau", category: "Data & BI", purpose: "Building visual analytics dashboards and communicating complex data trends.", icon: "PieChart" },
     { name: "Power BI", category: "Data & BI", purpose: "Business intelligence modeling, reporting dashboards, and dataset visualization.", icon: "BarChart" },

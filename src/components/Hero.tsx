@@ -1,26 +1,37 @@
 import React from 'react';
 import { 
   FileDown, 
-  FileText,
+  FileText, 
   Mail, 
   MapPin, 
   GraduationCap, 
-  ArrowRight,
-  ShieldCheck,
-  Brain,
-  Cpu,
-  Sparkles,
-  Code2
+  ArrowRight, 
+  ShieldCheck, 
+  Brain, 
+  Cpu, 
+  CheckCircle2, 
+  Code2,
+  Terminal,
+  Search,
+  Workflow
 } from 'lucide-react';
 import { resumeData } from '../data/resume';
 import { SkillUniversalGlobe } from './SkillUniversalGlobe';
+import { soundEngine } from '../utils/sound';
 
 interface HeroProps {
   onNavigate: (sectionId: string) => void;
   onOpenResumePreview: () => void;
+  onOpenTerminal?: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) => {
+export const Hero: React.FC<HeroProps> = ({ 
+  onNavigate, 
+  onOpenResumePreview,
+  onOpenTerminal,
+  onOpenCommandPalette
+}) => {
   return (
     <section
       id="hero"
@@ -30,10 +41,40 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Column: Professional Identity & Positioning */}
           <div className="lg:col-span-7 flex flex-col items-start text-left z-10">
-            {/* Status Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/40 text-xs text-cyan-300 mb-6 shadow-md backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-              <span className="font-medium tracking-wide">AI &amp; Data Science Graduate &bull; Available for Roles</span>
+            {/* Status Pill Badge & Interactive Tools */}
+            <div className="flex flex-wrap items-center gap-2.5 mb-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/40 text-xs text-cyan-300 shadow-md backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+                <span className="font-medium tracking-wide">AI &amp; Data Science Graduate &bull; Available for Roles</span>
+              </div>
+
+              {onOpenTerminal && (
+                <button
+                  onClick={() => {
+                    soundEngine.playClick();
+                    onOpenTerminal();
+                  }}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/40 text-xs font-mono font-bold text-emerald-400 hover:text-emerald-300 hover:border-emerald-400 transition-all cursor-pointer shadow-md"
+                  title="Launch Interactive Terminal Console"
+                >
+                  <Terminal className="w-3 h-3" />
+                  <span>Launch CLI Console</span>
+                </button>
+              )}
+
+              {onOpenCommandPalette && (
+                <button
+                  onClick={() => {
+                    soundEngine.playClick();
+                    onOpenCommandPalette();
+                  }}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/40 text-xs text-cyan-300 hover:text-white hover:border-cyan-400 transition-all cursor-pointer shadow-md"
+                  title="Open Spotlight Search (Ctrl+K)"
+                >
+                  <Search className="w-3 h-3 text-cyan-400" />
+                  <span>Search (Ctrl+K)</span>
+                </button>
+              )}
             </div>
 
             {/* Main Name Heading */}
@@ -44,11 +85,11 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
 
             {/* Position & Positioning Tagline */}
             <p className="text-base sm:text-lg text-slate-200 mb-3 max-w-2xl leading-relaxed">
-              <span className="text-cyan-400 font-semibold">AI &amp; Data Science Engineer</span> specializing in full-stack architecture, machine learning pipelines, relational databases, and secure web systems.
+              <span className="text-cyan-400 font-semibold">AI &amp; Data Science Engineer &bull; AI Tools Enthusiast</span> leveraging Google Antigravity, Google AI Studio, sophisticated prompt engineering, machine learning pipelines, and full-stack architecture.
             </p>
 
             <p className="text-xs sm:text-sm text-slate-400 mb-8 max-w-xl leading-relaxed font-normal">
-              Equipped with a strong engineering degree from Visvesvaraya Technological University (VTU), direct internship experience engineering enterprise hospital software (.NET &amp; MySQL), VAPT web security audits, and IoT robotics.
+              Equipped with a solid engineering degree from Visvesvaraya Technological University (VTU), direct internship experience building enterprise hospital software (.NET &amp; MySQL), VAPT web security audits, and IoT robotics.
             </p>
 
             {/* Status & Highlights Row */}
@@ -75,7 +116,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
 
               <div className="col-span-2 sm:col-span-1 p-3.5 rounded-2xl glass-panel border border-emerald-500/30 flex items-center gap-3 interactive-card">
                 <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
-                  <Sparkles className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div className="text-xs">
                   <span className="text-emerald-400 block text-[10px] uppercase font-semibold">Status</span>
@@ -87,7 +128,10 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
             {/* Action CTAs */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-8">
               <button
-                onClick={() => onNavigate('projects')}
+                onClick={() => {
+                  soundEngine.playClick();
+                  onNavigate('projects');
+                }}
                 className="px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-400 hover:from-cyan-300 hover:to-indigo-300 shadow-[0_0_25px_rgba(56,189,248,0.3)] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <span>Explore Projects</span>
@@ -95,7 +139,10 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
               </button>
 
               <button
-                onClick={onOpenResumePreview}
+                onClick={() => {
+                  soundEngine.playClick();
+                  onOpenResumePreview();
+                }}
                 className="px-5 py-3.5 rounded-xl font-medium text-xs sm:text-sm text-slate-200 glass-panel border border-slate-700 hover:border-cyan-500/50 hover:text-cyan-300 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <FileText className="w-4 h-4 text-cyan-400" />
@@ -103,7 +150,10 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
               </button>
 
               <button
-                onClick={() => onNavigate('contact')}
+                onClick={() => {
+                  soundEngine.playClick();
+                  onNavigate('contact');
+                }}
                 className="px-5 py-3.5 rounded-xl font-medium text-xs sm:text-sm text-slate-300 glass-panel border border-slate-700/80 hover:border-slate-500 hover:text-white transition-all flex items-center gap-2 cursor-pointer"
               >
                 <Mail className="w-4 h-4 text-slate-400" />
@@ -113,6 +163,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
               <a
                 href={resumeData.personal.resumeUrl}
                 download="FAISAL_REHMAN_Resume.pdf"
+                onClick={() => soundEngine.playClick()}
                 className="p-3.5 rounded-xl font-medium text-sm text-slate-400 glass-panel border border-slate-700/80 hover:text-cyan-300 transition-all flex items-center justify-center cursor-pointer"
                 title="Download Direct Resume PDF"
               >
@@ -126,14 +177,19 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
                 Core Domains:
               </span>
               {[
-                { label: 'Machine Learning', icon: <Brain className="w-3.5 h-3.5 text-cyan-400" />, target: 'skills' },
+                { label: 'AI Tools (Antigravity & AI Studio)', icon: <Workflow className="w-3.5 h-3.5 text-cyan-400" />, target: 'skills' },
+                { label: 'Prompt Engineering', icon: <Terminal className="w-3.5 h-3.5 text-emerald-400" />, target: 'skills' },
+                { label: 'Machine Learning', icon: <Brain className="w-3.5 h-3.5 text-sky-400" />, target: 'skills' },
                 { label: 'Full-Stack (.NET & SQL)', icon: <Code2 className="w-3.5 h-3.5 text-indigo-400" />, target: 'projects' },
                 { label: 'Cybersecurity & VAPT', icon: <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />, target: 'experience' },
                 { label: 'IoT & Telemetry', icon: <Cpu className="w-3.5 h-3.5 text-purple-400" />, target: 'projects' }
               ].map(chip => (
                 <button
                   key={chip.label}
-                  onClick={() => onNavigate(chip.target)}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    onNavigate(chip.target);
+                  }}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-cyan-500/40 transition-all hover:scale-105 cursor-pointer"
                 >
                   {chip.icon}
@@ -152,7 +208,10 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenResumePreview }) =
         {/* Scroll Indicator */}
         <div className="mt-14 flex justify-center">
           <button
-            onClick={() => onNavigate('about')}
+            onClick={() => {
+              soundEngine.playClick();
+              onNavigate('about');
+            }}
             className="flex flex-col items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors group cursor-pointer"
             aria-label="Scroll down to About section"
           >
